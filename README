@@ -1,0 +1,93 @@
+Created by John McPhie
+
+Directory Structure:
+resnet
+├── dataloader
+      ├── data_format.txt: Details of how data is formatted in the skeleton files.
+      ├── nturgbd_dataset.py: Custom dataset class used to load and preprocess skeleton files
+      └── read_skeleton.py: Helper for reading/parsing skeleton files.
+├── datasets
+      ├── backup: Copy of nturgb+d skeleton files in case of accidental modification
+      ├── nturgbd+d_skeletons: nturgb+d skeleton files
+      ├── preprocessed:
+            └── cross_subject:
+                  ├── test: Preprocessed testing data for the cross subject protocol (RGB and pt files).
+                  └── train: Preprocessed training data for the cross subject protocol (RGB and pt files).
+      └── raw: Raw skeleton data in both RGB images and pt files (all and cross-subject)
+            ├── raw: All single person skeleton files (RGB and pt files).
+            └── cross_subject:
+                  ├── test: Raw testing data for the cross subject protocol (RGB and pt files).
+                  └── train: Raw training data for the cross subject protocol (RGB and pt files).
+├── model
+      ├── base.py: Original resnet.py from https://github.com/pytorch/vision/blob/master/torchvision/models/resnet.py
+      ├── resnet.py: Custom/Modified version of file found at above mentioned github.
+      └── utils.py: Required utility file for resnet.py and base.py
+├── results: Default folder for results of running train.py (Training and Testing graphs of loss and accuracy)
+      ├── Various Experiments: Each folder in this directory represents an experiment run with train.py
+      └── ResNet18Testing.docx: A word doc detailing the configurations and results of various experiments.
+├── utils
+      ├── image_processing.py: All functions used for preprocessing are found in here.
+      ├── read_skeleton.py: A copy of the file found in the dataloader directory included for convenience.
+      └── visualization.py: Functions useful for visualizing data instances.
+├── videos:
+      ├── rgb: AVI videos corresponding to the skeleton files.
+      ├── zips: A folder containing all the zips for the rgb videos (separated by setup_id)
+      └── README: A file detailing some missing video files. 
+├── visual: Various visualizations of the training processes
+      ├── preprocess_samples: Examples of preprocessing effects
+      ├── 2020-01-23_11:58:52: RGB representations of preprocessed data sorted by classes
+      └── joint_mappings: A pdf showing the zero-indexed positions of the joints as found in the skeleton files/torch tensors.
+├── ignored_samples.txt: List of samples with missing or incorrect data
+├── test.py: A simple python script used for testing various components.
+└── train.py: Script for training the resnet found in model->resnet.py. See section Training Instructions
+
+
+Training Instructions:
+  Run experiment: 'python train.py'
+  An optional name can be given to help keep track of different experiments.
+  For example, if you wanted to run an experiment and save the results as
+  "experiment_01" you would run: 'python train.py --name experiment_01' This
+  would save the results of training and testing in a subdirectory called
+  experiment_01 within the results folder.
+
+  Inside the actual train.py there is a custom dataset class used to load in the
+   skeleton data. You have the option to load the data from the raw skeleton
+   files (very slow) or to load the from the pt files created from the skeleton
+   files (quicker because of there is no requirement to reparse the skeleton
+   files). However, the parameters for the different protocols only work when
+   reading from skeleton files (for right now) so I would suggest generating the
+   protocols without any preprocessing first (there are some helper functions in
+   the nturgbd_dataset.py file) and then loading those using the NTU_RGB_D class
+   while specifying the wanted preprocessing. Make note that all preprocessing
+   is turned on by default, so you have to set each parameter to false if you
+   don't want it.
+
+   For example:
+   'train_dataset = NTU_RGB_D('/home/john/working/resnet/datasets/raw/cross_subject/train/', filetype='pt',
+         preprocess=True, rotate=False, zero_center=False, normalize=False,
+         exclude_joints=None, smooth=False, group_joints=True)'
+
+    *Note: Right now the nturgbd_dataset.py file only loads skeleton files that
+    represent single person classes.
+
+Helpful Hints:
+  All functions are designed to be called from the main project directory, so
+  if you want to test out any functions, you can use the test.py file which
+  should load everything that you need.
+
+  All functions have been fully documented, so if you want to know what a
+  certain function does, or how to use it, you can type help(function_name). For
+  example, if you wanted to know more about the visualize function, you can
+  call help(V.visualize) within the train.py file.
+
+  There is also a test() function in some of the files that gives a simple use
+  case for the file as a whole. For example, in the nturgbd_dataset.py file.
+
+  Something else that I found useful was being able to test out the custom
+  resnet by running it on the cpu while running an experiment on the gpu. To
+  make this easier, I added a parameter specifying the device the model should
+  be run on. Because it is kind of difficult to change all aspects, if you are
+  running the model on the gpu, you still need to call model.cuda() and
+  inputs, labels = inputs.cuda(), labels.cuda(). However, if you want to run it
+  on the cpu, you need to specify device='cpu'. You can find examples of both
+  in train.py.

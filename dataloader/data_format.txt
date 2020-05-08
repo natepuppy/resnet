@@ -1,0 +1,14 @@
+framecount
+	bodycount for frame (example 2)
+	tracking_id clipedEdges handLeftConfidence handLeftState handRightConfidence handRightState isRestricted leanX leanY trackingState (body info)
+		numJoints for body in frame (example 2)
+		x y z depthX depthY colorX colorY orientationW orientationX orientationY orientationZ trackingState (joint info)
+		x y z depthX depthY colorX colorY orientationW orientationX orientationY orientationZ trackingState (joint info)
+	tracking_id clipedEdges handLeftConfidence handLeftState handRightConfidence handRightState isRestricted leanX leanY trackingState (body info)
+		numJoints for body in frame
+		x y z depthX depthY colorX colorY orientationW orientationX orientationY orientationZ trackingState (joint info)
+		x y z depthX depthY colorX colorY orientationW orientationX orientationY orientationZ trackingState (joint info)
+
+
+If you want to see if you parsed it right, you can loop through the images and
+use image[:, 0] to see all the joints for the first frame. 
